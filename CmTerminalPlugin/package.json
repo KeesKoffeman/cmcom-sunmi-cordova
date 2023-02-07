@@ -1,0 +1,17 @@
+{
+  "name": "com.cm.cordova.plugins.terminal",
+  "version": "1.0.0",
+  "description": "Plugin for cm.com terminal SDK.",
+  "cordova": {
+    "id": "com.cm.cordova.plugins.terminal",
+    "platforms": [
+      "android"
+    ]
+  },
+  "keywords": [
+    "ecosystem:cordova",
+    "cordova-android"
+  ],
+  "author": "Kees Koffeman",
+  "license": "ISC"
+}

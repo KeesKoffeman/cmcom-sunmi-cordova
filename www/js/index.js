@@ -7,10 +7,7 @@ function onDeviceReady() {
     console.log('Running cordova-' + cordova.platformId + '@' + cordova.version);
     document.getElementById('deviceready').classList.add('ready');
     document.getElementById("btnPaymentViaShim").addEventListener("click", executePaymentViaShim);
-
-    window.plugins.intentShim.onIntent(function (intent) {
-        console.log('Received Intent: ' + JSON.stringify(intent.extras));
-    });
+    document.getElementById("btnPaymentViaPlugin").addEventListener("click", executePaymentViaPlugin);
 }
 
 function executePaymentViaShim() {
@@ -19,7 +16,7 @@ function executePaymentViaShim() {
     let amount = document.getElementById("amount").value
     let reference = document.getElementById("reference").value
 
-    console.log(`Starting Payment ${reference}; ${currency} ${amount}.`)
+    console.log(`Starting Payment ${reference} via Shim; ${currency} ${amount}.`)
 
     window.plugins.intentShim.startActivity(
         {
@@ -40,12 +37,22 @@ function executePaymentViaShim() {
                 'Payment OK!'
             );
         },
-        function() {
-            navigator.notification.alert(
-                'Failed to execute payment via Intent.',
-                null,
-                'Failure'
-            );
-        }
+        () => navigator.notification.alert('Failed to execute payment via Shim.', null, 'Failure')
     );
+}
+
+function executePaymentViaPlugin() {
+    let currency = document.getElementById("currency").value
+    let amount = document.getElementById("amount").value
+    let reference = document.getElementById("reference").value
+
+    console.log(`Starting Payment ${reference} via Plugin; ${currency} ${amount}.`)
+
+    cordova.exec(
+        function(result) { navigator.notification.confirm(data, null, 'Payment OK!') },
+        (errorCode) => navigator.notification.alert(`Failed to execute payment via Plugin, error = ${errorCode}`, null, `Failure ${errorCode}`),
+        "CmTerminalPlugin",
+        "transaction",
+        [currency, amount, reference]
+    )
 }
