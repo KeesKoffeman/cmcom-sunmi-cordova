@@ -1,29 +1,51 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-
 // Wait for the deviceready event before using any of Cordova's device APIs.
 // See https://cordova.apache.org/docs/en/latest/cordova/events/events.html#deviceready
 document.addEventListener('deviceready', onDeviceReady, false);
 
 function onDeviceReady() {
-    // Cordova is now initialized. Have fun!
 
     console.log('Running cordova-' + cordova.platformId + '@' + cordova.version);
     document.getElementById('deviceready').classList.add('ready');
+    document.getElementById("btnPaymentViaShim").addEventListener("click", executePaymentViaShim);
+
+    window.plugins.intentShim.onIntent(function (intent) {
+        console.log('Received Intent: ' + JSON.stringify(intent.extras));
+    });
+}
+
+function executePaymentViaShim() {
+
+    let currency = document.getElementById("currency").value
+    let amount = document.getElementById("amount").value
+    let reference = document.getElementById("reference").value
+
+    console.log(`Starting Payment ${reference}; ${currency} ${amount}.`)
+
+    window.plugins.intentShim.startActivity(
+        {
+            action: "com.payplaza.dev.action.TRANSACTION",
+            extras: {
+                'com.payplaza.extra.TRANSACTION_TYPE' : 'purchase',
+                'com.payplaza.extra.CURRENCY_CODE' : currency,
+                'com.payplaza.extra.AMOUNT' : amount * 100,
+                'com.payplaza.extra.ORDERREF' : reference,
+                'com.payplaza.extra.USE_PROC_STYLE_PROTOCOL' : true
+            }
+        },
+        function(intent) {
+            console.log(intent)
+            navigator.notification.confirm(
+                JSON.stringify(intent.extras),
+                null,
+                'Payment OK!'
+            );
+        },
+        function() {
+            navigator.notification.alert(
+                'Failed to execute payment via Intent.',
+                null,
+                'Failure'
+            );
+        }
+    );
 }

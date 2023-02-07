@@ -13,11 +13,17 @@
   "author": "Apache Cordova Team",
   "license": "Apache-2.0",
   "devDependencies": {
-    "cordova-android": "^10.1.2"
+    "com-darryncampbell-cordova-plugin-intent": "^2.2.0",
+    "cordova-android": "^10.1.2",
+    "cordova-plugin-dialogs": "^2.0.2"
   },
   "cordova": {
     "platforms": [
       "android"
-    ]
+    ],
+    "plugins": {
+      "com-darryncampbell-cordova-plugin-intent": {},
+      "cordova-plugin-dialogs": {}
+    }
   }
 }
